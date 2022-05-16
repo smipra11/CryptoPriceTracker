@@ -1,6 +1,6 @@
 import React, { useEffect,useState } from "react";
 
-import { AntDesign, EvilIcons, Ionicons } from "@expo/vector-icons";
+import { AntDesign, EvilIcons, Ionicons,FontAwesome } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -64,7 +64,7 @@ const CoinDetailedScreen = () => {
   const {
     image: { small },
     name,
-
+   id,
     market_data: {
       market_cap_rank,
       current_price,
@@ -106,6 +106,7 @@ const CoinDetailedScreen = () => {
           image={small}
           symbol={symbol}
           marketCapRank={market_cap_rank}
+          coinId={id}
         />
         <View
           style={{

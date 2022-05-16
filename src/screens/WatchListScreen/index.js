@@ -1,14 +1,46 @@
-import React,{useContext} from 'react'
-import {View,Text} from 'react-native'
-import {WatchlistContext} from "../../Contexts/WatchlistContext"
+import React,{useContext,useState,useEffect} from 'react'
+import {View,Text,FlatList,RefreshControl} from 'react-native'
+import CoinItem from "../../components/CoinItem"
+import {useWatchlist} from "../../Contexts/WatchlistContext"
+import { getWatchlistedCoins } from '../../services/requests'
+
 
 const WatchList  = () =>{
-    const {value} = useContext(WatchlistContext)
-console.log(value)
-return(
-    <View>
-        <Text> Watch list screen</Text>
-    </View>
-)
+    const {watchlistCoinIds} = useWatchlist();
+
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const transformCoinIds = () => watchlistCoinIds.join('%2C');
+
+  const fetchWatchlistedCoins = async () => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    const watchlistedCoinsData = await getWatchlistedCoins(1, transformCoinIds());
+    setCoins(watchlistedCoinsData);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (watchlistCoinIds.length > 0) {
+      fetchWatchlistedCoins();
+    }
+  }, [watchlistCoinIds]);
+
+  return (
+    <FlatList 
+      data={coins}
+      renderItem={({ item }) => <CoinItem marketCoin={item} />}
+      refreshControl={
+        <RefreshControl 
+          refreshing={loading}
+          tintColor="white"
+          onRefresh={watchlistCoinIds.length > 0 ? fetchWatchlistedCoins : null}
+        />
+      }
+    />
+  )
 }
 export default WatchList
